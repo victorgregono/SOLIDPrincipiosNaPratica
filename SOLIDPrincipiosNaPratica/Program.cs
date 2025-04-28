@@ -1,7 +1,16 @@
-﻿namespace SOLIDPrincipiosNaPratica
+﻿using SOLIDPrincipiosNaPratica.repositorio;
+using SOLIDPrincipiosNaPratica.Repositorio.Interface;
+using SOLIDPrincipiosNaPratica.Services;
+
+namespace SOLIDPrincipiosNaPratica
 {
     class Program
     {
+        private readonly IServicoUsuario _servicoUsuario;
+        public Program(IServicoUsuario servicoUsuario)
+        {
+            _servicoUsuario = servicoUsuario;
+        }
         static void Main(string[] args)
         {
             Console.WriteLine("Exemplos de Princípios SOLID:");
@@ -10,8 +19,9 @@
             // S - Exemplo do Princípio da Responsabilidade Única
             Console.WriteLine("\n[S] - Single Responsibility Principle (Princípio da Responsabilidade Única)");
             Console.WriteLine("Cada classe deve ter apenas uma única responsabilidade");
-            var servicoUsuario = new ServicoUsuario(new RepositorioUsuarioBancoDados());
-            servicoUsuario.RegistrarUsuario("joaosilva", "joao@exemplo.com");
+
+            var program = new Program(new ServicoUsuario(new RepositorioUsuarioBancoDados()));
+            program._servicoUsuario.RegistrarUsuario("joaosilva", "joao@exemplo.com");
 
             // O - Exemplo do Princípio Aberto/Fechado
             Console.WriteLine("\n[O] - Open/Closed Principle (Princípio Aberto/Fechado)");
@@ -58,100 +68,6 @@
             Console.ReadLine();
         }
     }
-
-    #region S - Princípio da Responsabilidade Única (SRP - Single Responsibility Principle)
-
-    /// <summary>
-    /// S - Modelo de usuário representando um usuário no sistema.
-    /// 
-    /// O QUE É: O princípio S (Responsabilidade Única) diz que uma classe deve fazer apenas uma coisa.
-    /// É como se cada classe tivesse um único trabalho, assim como cada pessoa em uma empresa 
-    /// tem uma função específica.
-    ///
-    /// PARA QUE SERVE: Evita classes que fazem muitas coisas ao mesmo tempo, o que torna o código 
-    /// mais organizado, mais fácil de entender e de modificar. É como se você não pedisse para 
-    /// o cozinheiro de um restaurante também limpar os banheiros - cada um faz o que sabe melhor.
-    /// 
-    /// NESTE EXEMPLO: Esta classe Usuario só tem a responsabilidade de armazenar dados do usuário, 
-    /// não faz mais nada.
-    /// </summary>
-    public class Usuario
-    {
-        public string NomeUsuario { get; set; }
-        public string Email { get; set; }
-    }
-
-    /// <summary>
-    /// S - Interface para operações de repositório de usuário.
-    /// Responsabilidade Única (SRP): Define operações de acesso a dados.
-    /// </summary>
-    public interface IRepositorioUsuario
-    {
-        /// <summary>
-        /// Salva um usuário no armazenamento de dados.
-        /// </summary>
-        /// <param name="usuario">O usuário a ser salvo</param>
-        void Salvar(Usuario usuario);
-    }
-
-    /// <summary>
-    /// S - Implementação de banco de dados do repositório de usuário.
-    /// Responsabilidade Única (SRP): Lida apenas com operações de banco de dados para usuários.
-    /// </summary>
-    public class RepositorioUsuarioBancoDados : IRepositorioUsuario
-    {
-        /// <summary>
-        /// Salva um usuário no banco de dados.
-        /// </summary>
-        /// <param name="usuario">O usuário a ser salvo</param>
-        public void Salvar(Usuario usuario)
-        {
-            Console.WriteLine($"Salvando usuário {usuario.NomeUsuario} no banco de dados");
-            // Lógica de salvamento no banco de dados aqui
-        }
-    }
-
-    /// <summary>
-    /// S - Serviço que gerencia a lógica de negócios relacionada a usuários.
-    /// Responsabilidade Única (SRP): Encapsula apenas operações de negócios relacionadas ao usuário.
-    /// </summary>
-    public class ServicoUsuario
-    {
-        private readonly IRepositorioUsuario _repositorioUsuario;
-
-        /// <summary>
-        /// Inicializa uma nova instância do ServicoUsuario.
-        /// </summary>
-        /// <param name="repositorioUsuario">A implementação do repositório de usuário</param>
-        public ServicoUsuario(IRepositorioUsuario repositorioUsuario)
-        {
-            _repositorioUsuario = repositorioUsuario;
-        }
-
-        /// <summary>
-        /// Registra um novo usuário no sistema.
-        /// </summary>
-        /// <param nomeUsuario="nomeUsuario">O nome de usuário</param>
-        /// <param email="email">O email do usuário</param>
-        public void RegistrarUsuario(string nomeUsuario, string email)
-        {
-            // Validar entrada
-            if (string.IsNullOrEmpty(nomeUsuario) || string.IsNullOrEmpty(email))
-            {
-                throw new ArgumentException("Nome de usuário e email são obrigatórios");
-            }
-
-            // Criar usuário
-            var usuario = new Usuario { NomeUsuario = nomeUsuario, Email = email };
-
-            // Salvar usuário
-            _repositorioUsuario.Salvar(usuario);
-
-            Console.WriteLine($"Usuário {nomeUsuario} registrado com sucesso!");
-        }
-    }
-
-    #endregion
 
     #region O - Princípio Aberto/Fechado (OCP - Open/Closed Principle)
 
